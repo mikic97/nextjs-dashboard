@@ -38,17 +38,20 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
     useEffect(() => {
         fetch('https://reqres.in/api/users')
             .then(response => response.json())
-            .then(data => setUsers(data.data.map((item: any) => ({
-                id: item.id,
-                first_name: item.first_name,
-                last_name: item.last_name,
-                email: item.email
-            }))));
+            .then(data => {
+                setUsers(data.data.map((item: any) => ({
+                    id: item.id,
+                    first_name: item.first_name,
+                    last_name: item.last_name,
+                    email: item.email
+                })));
+            });
     }, [setUsers]);
 
     const handleAddUser = () => {
-        setUsers([...users, { ...newUser, id: Date.now() }]);
-        setNewUser({ id: 0, first_name: '', last_name: '', email: '' });
+        const newUserWithId = { ...newUser, id: Date.now() }; // Dodaje se novi korisnik sa generisanim ID
+        setUsers([...users, newUserWithId]);
+        setNewUser({ id: 0, first_name: '', last_name: '', email: '' }); // Resetovanje polja za unos
     };
 
     const filteredUsers = searchTerm
@@ -62,45 +65,47 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
         <ThemeProvider theme={theme}>
             <Paper style={{ margin: '1em', padding: '1em' }}>
                 <Grid container spacing={2} style={{ marginBottom: '1em' }}>
-                    <Grid item xs={12} md={4}>
+                    {/* Polja za unos novog korisnika */}
+                    <Grid item xs={12} md={3}>
                         <TextField
                             label="Ime"
                             value={newUser.first_name}
-                            onChange={e => setNewUser({ ...newUser, first_name: e.target.value })}
+                            onChange={(e) => setNewUser({ ...newUser, first_name: e.target.value })}
                             fullWidth
-                            variant="outlined"
                         />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={3}>
                         <TextField
-                            label="Priimek"
+                            label="Prezime"
                             value={newUser.last_name}
-                            onChange={e => setNewUser({ ...newUser, last_name: e.target.value })}
+                            onChange={(e) => setNewUser({ ...newUser, last_name: e.target.value })}
                             fullWidth
-                            variant="outlined"
                         />
                     </Grid>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={3}>
                         <TextField
                             label="Email"
                             value={newUser.email}
-                            onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                             fullWidth
-                            variant="outlined"
                         />
                     </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" onClick={handleAddUser} style={{ marginBottom: '1em' }}>Dodaj uporabnika</Button>
+                    <Grid item xs={12} md={3}>
+                        <Button variant="contained" color="primary" onClick={handleAddUser}>Dodaj Korisnika</Button>
                     </Grid>
+
+                    {/* Polje za pretragu korisnika */}
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
                             variant="outlined"
-                            label="Iskanje uporabnika"
+                            label="Pretraga korisnika"
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </Grid>
                 </Grid>
+
+                {/* Prikaz liste korisnika */}
                 <List style={{ marginTop: '1em', backgroundColor: theme.palette.background.default }}>
                     {filteredUsers.map(user => (
                         <React.Fragment key={user.id}>
