@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { List, ListItem, ListItemText, Divider, Button, TextField, Grid, Paper } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+// User type definition
 type User = {
     id: number;
     first_name: string;
@@ -9,6 +10,7 @@ type User = {
     email: string;
 };
 
+// Props type definition
 type UserListProps = {
     onSelectUser: (user: User) => void;
     onDeleteUser: (userId: number) => void;
@@ -16,6 +18,7 @@ type UserListProps = {
     users: User[];
 };
 
+// MUI theme configuration
 const theme = createTheme({
     palette: {
         mode: 'light',
@@ -35,6 +38,7 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [newUser, setNewUser] = useState({ id: 0, first_name: '', last_name: '', email: '' });
 
+    // Fetch users from the API
     useEffect(() => {
         fetch('https://reqres.in/api/users')
             .then(response => response.json())
@@ -57,12 +61,14 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
             });
     }, [setUsers]);
 
+    // Handle adding a new user
     const handleAddUser = () => {
         const newUserWithId = { ...newUser, id: Date.now() };
         setUsers([...users, newUserWithId]);
         setNewUser({ id: 0, first_name: '', last_name: '', email: '' });
     };
 
+    // Filter users based on search term
     const filteredUsers = searchTerm
         ? users.filter(user =>
             user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,6 +80,7 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
         <ThemeProvider theme={theme}>
             <Paper style={{ margin: '1em', padding: '1em' }}>
                 <Grid container spacing={2} style={{ marginBottom: '1em' }}>
+                    {/* Input fields for adding a new user */}
                     <Grid item xs={12} md={3}>
                         <TextField
                             label="Ime"
@@ -101,6 +108,8 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
                     <Grid item xs={12} md={3}>
                         <Button variant="contained" color="primary" onClick={handleAddUser}>Dodaj Korisnika</Button>
                     </Grid>
+
+                    {/* Search field */}
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
@@ -110,6 +119,8 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
                         />
                     </Grid>
                 </Grid>
+
+                {/* List of users */}
                 <List style={{ marginTop: '1em', backgroundColor: theme.palette.background.default }}>
                     {filteredUsers.map(user => (
                         <React.Fragment key={user.id}>
