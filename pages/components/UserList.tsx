@@ -39,19 +39,28 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
         fetch('https://reqres.in/api/users')
             .then(response => response.json())
             .then(data => {
-                setUsers(data.data.map((item: any) => ({
-                    id: item.id,
-                    first_name: item.first_name,
-                    last_name: item.last_name,
-                    email: item.email
-                })));
+                if (data && data.data) {
+                    const fetchedUsers = data.data.map((item: any) => ({
+                        id: item.id,
+                        first_name: item.first_name,
+                        last_name: item.last_name,
+                        email: item.email
+                    }));
+                    setUsers(fetchedUsers);
+                } else {
+                    setUsers([]); // Set to empty array if no data is received
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+                setUsers([]); // Set to empty array in case of an error
             });
     }, [setUsers]);
 
     const handleAddUser = () => {
-        const newUserWithId = { ...newUser, id: Date.now() }; // Dodaje se novi korisnik sa generisanim ID
+        const newUserWithId = { ...newUser, id: Date.now() };
         setUsers([...users, newUserWithId]);
-        setNewUser({ id: 0, first_name: '', last_name: '', email: '' }); // Resetovanje polja za unos
+        setNewUser({ id: 0, first_name: '', last_name: '', email: '' });
     };
 
     const filteredUsers = searchTerm
@@ -65,7 +74,6 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
         <ThemeProvider theme={theme}>
             <Paper style={{ margin: '1em', padding: '1em' }}>
                 <Grid container spacing={2} style={{ marginBottom: '1em' }}>
-                    {/* Polja za unos novog korisnika */}
                     <Grid item xs={12} md={3}>
                         <TextField
                             label="Ime"
@@ -93,8 +101,6 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
                     <Grid item xs={12} md={3}>
                         <Button variant="contained" color="primary" onClick={handleAddUser}>Dodaj Korisnika</Button>
                     </Grid>
-
-                    {/* Polje za pretragu korisnika */}
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
@@ -104,8 +110,6 @@ const UserList: React.FC<UserListProps> = ({ users, onSelectUser, onDeleteUser, 
                         />
                     </Grid>
                 </Grid>
-
-                {/* Prikaz liste korisnika */}
                 <List style={{ marginTop: '1em', backgroundColor: theme.palette.background.default }}>
                     {filteredUsers.map(user => (
                         <React.Fragment key={user.id}>
